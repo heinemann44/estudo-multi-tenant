@@ -1,43 +1,54 @@
 package br.com.will.thread;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 import br.com.will.dto.TenantDTO;
-import br.com.will.tenant.DatasourceTenantConfigResolver;
-import io.agroal.api.AgroalDataSource;
 import io.quarkus.logging.Log;
-import jakarta.enterprise.inject.spi.CDI;
 
 public class FlyWayThread implements Callable<Boolean> {
 
-    private final FluentConfiguration flywayConfiguration;
     private final TenantDTO clientConfig;
 
-    public FlyWayThread(FluentConfiguration flywayConfiguration, TenantDTO clientConfig) {
-        this.flywayConfiguration = flywayConfiguration;
+    public FlyWayThread(TenantDTO clientConfig) {
         this.clientConfig = clientConfig;
     }
 
     @Override
     public Boolean call() throws Exception {
 
-        DatasourceTenantConfigResolver resolver = CDI.current().select(DatasourceTenantConfigResolver.class).get();
+        try {
 
-        try (AgroalDataSource dataSource = resolver
-                .doCreateDataSource(clientConfig.getTenantId())) {
+            Log.infov("Running migration for: {0}", clientConfig.getTenantId());
 
-            flywayConfiguration.dataSource(dataSource);
+            FluentConfiguration flywayConfiguration = this.getFlywayConfiguration();
+
+            flywayConfiguration.dataSource(clientConfig.getDatasource());
             Flyway f = new Flyway(flywayConfiguration);
             f.migrate();
+
+            Log.infov("Migration {0} has been finalized", clientConfig.getTenantId());
 
         } catch (Exception e) {
             Log.errorv("Error when running migration for: {0}", clientConfig.getTenantId());
 
         }
         return Boolean.TRUE;
+    }
+
+    private FluentConfiguration getFlywayConfiguration() {
+        FluentConfiguration flywayConfiguration = Flyway.configure();
+        flywayConfiguration.table("tb_schemamigration");
+        flywayConfiguration.locations("db/migration/client");
+        flywayConfiguration.sqlMigrationPrefix("v");
+        flywayConfiguration.baselineOnMigrate(Boolean.TRUE);
+        flywayConfiguration.connectRetries(0);
+        flywayConfiguration.encoding(StandardCharsets.UTF_8);
+        flywayConfiguration.validateOnMigrate(Boolean.FALSE);
+        return flywayConfiguration;
     }
 
 }

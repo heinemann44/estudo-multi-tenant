@@ -1,5 +1,6 @@
 package br.com.will.dto;
 
+import io.agroal.api.AgroalDataSource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,7 @@ public class TenantDTO {
         private String datasourcePassword;
 
         private Boolean flagSSL;
+
+        private AgroalDataSource datasource;
 
 }

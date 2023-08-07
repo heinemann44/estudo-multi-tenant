@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
@@ -13,6 +15,7 @@ import br.com.will.dto.TenantConfigsDTO;
 import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
 import br.com.will.service.TenantService;
+import br.com.will.thread.FlyWayThread;
 import br.com.will.thread.TenantAwareThread;
 import io.agroal.api.AgroalDataSource;
 import io.agroal.api.AgroalPoolInterceptor;
@@ -164,6 +167,16 @@ public class DatasourceTenantConfigResolver implements TenantConnectionResolver 
             dataSource.setPoolInterceptors(interceptorList);
         }
 
+        tenantConfig.setDatasource(dataSource);
+
+        FlyWayThread migrationThread = new FlyWayThread(tenantConfig);
+
+        // Should await?
+        try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+
+            executor.submit(migrationThread);
+        }
+
         return dataSource;
     }
 
@@ -204,6 +217,7 @@ public class DatasourceTenantConfigResolver implements TenantConnectionResolver 
         poolConfiguration.initialSize(configuration.getMinSize());
         poolConfiguration.minSize(configuration.getMinSize());
         poolConfiguration.maxSize(configuration.getMaxSize());
+        poolConfiguration.maxLifetime(Duration.ofMinutes(30));
 
         poolConfiguration.connectionValidator(AgroalConnectionPoolConfiguration.ConnectionValidator.defaultValidator());
         poolConfiguration.acquisitionTimeout(Duration.ofSeconds(5));

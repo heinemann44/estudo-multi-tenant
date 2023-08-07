@@ -124,13 +124,13 @@ The request body should contain the Car details in JSON format, for example:
 
 3. **Customizable Migrations:** Allow tenants to customize their migrations.
 
-4. **Audit Trail:** Implement an audit trail for tracking tenant actions.
-
-5. **Multi-Tenant Reports:** Provide custom reports for each tenant.
-
-6. **Tenant Usage Statistics:** Offer insights into tenant resource usage.
+4. **Tenant Usage Statistics:** Offer insights into tenant resource usage.
    
-7. **Virtual Threads:** Replace currents threads to virtual threads.
+5. **Virtual Threads:** Replace currents threads to virtual threads.
+
+6. **Connections Enhanced:** Optimize connection usage, a solution to recognize tenants that point to the same database. Currently, Agroal does not identify this situation and creates separate connections for each tenant, even when they share the same database.
+
+7. **Close Connections:** Implement a way to programmatically close connections. Currently, if a tenant is deleted from the database, the connections are still active. 
 
 
 # Conclusion

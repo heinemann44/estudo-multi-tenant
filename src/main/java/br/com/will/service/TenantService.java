@@ -1,5 +1,6 @@
 package br.com.will.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +10,11 @@ import org.hibernate.SessionFactory;
 import br.com.will.dto.TenantConfigsDTO;
 import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
-import br.com.will.migration.FlyWayMigration;
 import br.com.will.model.TenantConfig;
 import br.com.will.repository.TenantConfigRepository;
 import br.com.will.util.ObjectMapperUtils;
+import io.agroal.api.AgroalDataSource;
+import io.agroal.api.AgroalDataSource.FlushMode;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
@@ -31,9 +33,6 @@ public class TenantService {
     @Inject
     SessionFactory sessionFactory;
 
-    @Inject
-    FlyWayMigration flyWayMigration;
-
     @Transactional
     public void updateTenants() {
         Log.info("Updating tenants");
@@ -51,9 +50,6 @@ public class TenantService {
         List<TenantConfig> newTenants = tenantConfigRepository.findAll().list();
 
         TenantConfigsDTO.setConfigs(ObjectMapperUtils.mapAll(newTenants, TenantDTO.class));
-
-        // Spaw a lot of connections
-        // flyWayMigration.checkMigration();
 
     }
 
@@ -82,6 +78,26 @@ public class TenantService {
 
             if (tenantConfig == null) {
                 throw new WebServiceException("Tenant not found", Status.NOT_FOUND);
+            }
+
+            Optional<TenantDTO> currentTenant = TenantConfigsDTO.findOptionalClient(tenantConfig.getTenantId());
+
+            if (currentTenant.isPresent()) {
+                AgroalDataSource dataSource = currentTenant.get().getDatasource();
+                /**
+                 * TODO how to Fix?
+                 * 
+                 * This close the connections to databse
+                 * But the Tenant still alive
+                 * If retry to connect will fail with
+                 * ERROR [org.hib.eng.jdb.spi.SqlExceptionHelper] (executor-thread-1) This pool
+                 * is closed and does not handle any more connections!
+                 * 
+                 * if (dataSource != null) {
+                 * dataSource.flush(FlushMode.ALL);
+                 * dataSource.close();
+                 * }
+                 */
             }
         } else {
             tenantConfig = new TenantConfig();
