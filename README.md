@@ -20,14 +20,6 @@ Make sure you have the following requirements installed on your machine before p
 
 To use this project, you will need to have a PostgreSQL server running and configure the connection details in the `application.properties` file. Quarkus will automatically create the tenant's database when a new tenant is created.
 
-## Agroal Configuration (Suggestion)
-
-To optimize connection usage and improve system performance, we suggest implementing a solution to recognize tenants that point to the same database. Currently, Agroal does not identify this situation and creates separate connections for each tenant, even when they share the same database.
-
-The suggestion is to develop a cache mechanism that stores connection information for already registered tenants. Before creating a new connection, the system should check if the tenant's data to be created points to the same database as any existing tenant in the cache. If positive, the new tenant should share the same connection with the existing database, avoiding the creation of unnecessary multiple connections.
-
-This approach will help reduce the Agroal connection pool overhead and make the use of tenants with the same database more efficient. By implementing this suggestion, the system will be able to identify tenants related to the same database and handle their connections more intelligently, ensuring better utilization of available resources.
-
 ## Installation and Execution
 
 Follow the steps below to install and run the application:
