@@ -22,7 +22,7 @@ public class TenantDTO {
 
         private String datasourcePassword;
 
-        private Boolean flagSSL;
+        private Boolean flagSSL = Boolean.FALSE;
 
         private AgroalDataSource datasource;
 
