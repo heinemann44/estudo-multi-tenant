@@ -4,6 +4,8 @@ import java.util.List;
 
 import br.com.will.dto.CarDTO;
 import br.com.will.service.CarService;
+import io.quarkus.logging.Log;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -30,21 +32,24 @@ public class CarController {
     CarService carService;
 
     @POST
+    @RunOnVirtualThread
     @Path("/save")
     public Response save(CarDTO carDTO) {
         carService.save(carDTO);
-
+        Log.info(Thread.currentThread());
         return Response.ok().build();
     }
 
     @GET
+    @RunOnVirtualThread
     @Path("/listAll")
     public List<CarDTO> listAll() {
-
+        Log.info(Thread.currentThread());
         return carService.listAll();
     }
 
     @DELETE
+    @RunOnVirtualThread
     @Path("/delete/{id}")
     public Response delete(@PathParam("id") Long id) {
         carService.delete(id);

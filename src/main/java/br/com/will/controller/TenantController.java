@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.com.will.dto.TenantDTO;
 import br.com.will.service.TenantService;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -30,6 +31,7 @@ public class TenantController {
     TenantService tenantService;
 
     @POST
+    @RunOnVirtualThread
     @Path("/save")
     public Response save(TenantDTO tenantDTO) {
         tenantService.save(tenantDTO);
@@ -38,6 +40,7 @@ public class TenantController {
     }
 
     @GET
+    @RunOnVirtualThread
     @Path("/listAll")
     public List<TenantDTO> listAll() {
 
@@ -45,6 +48,7 @@ public class TenantController {
     }
 
     @DELETE
+    @RunOnVirtualThread
     @Path("/delete/{id}")
     public Response delete(@PathParam("id") Long id) {
         tenantService.delete(id);

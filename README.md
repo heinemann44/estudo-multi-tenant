@@ -15,6 +15,7 @@ Make sure you have the following requirements installed on your machine before p
 7. Lombok
 8. Hibernate with Panache
 9. Resteasy with Jackson
+10. Virtual Threads (Preview)
 
 ## Database Configuration
 
@@ -117,12 +118,10 @@ The request body should contain the Car details in JSON format, for example:
 3. **Customizable Migrations:** Allow tenants to customize their migrations.
 
 4. **Tenant Usage Statistics:** Offer insights into tenant resource usage.
-   
-5. **Virtual Threads:** Replace currents threads to virtual threads.
 
-6. **Connections Enhanced:** Optimize connection usage, a solution to recognize tenants that point to the same database. Currently, Agroal does not identify this situation and creates separate connections for each tenant, even when they share the same database.
+5. **Connections Enhanced:** Optimize connection usage, a solution to recognize tenants that point to the same database. Currently, Agroal does not identify this situation and creates separate connections for each tenant, even when they share the same database.
 
-7. **Close Connections:** Implement a way to programmatically close connections. Currently, if a tenant is deleted from the database, the connections are still active. 
+6. **Close Connections:** Implement a way to programmatically close connections. Currently, if a tenant is deleted from the database, the connections are still active. 
 
 
 # Conclusion

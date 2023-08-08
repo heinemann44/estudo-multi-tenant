@@ -19,6 +19,7 @@ public class FlyWayThread implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
+        Log.infov("Running migration with {0}", Thread.currentThread());
 
         try {
 

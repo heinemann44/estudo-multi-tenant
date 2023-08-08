@@ -121,6 +121,7 @@ public class DatasourceTenantConfigResolver implements TenantConnectionResolver 
             thread.start();
 
             try {
+                // Join doesn't have effect with Virtual Thread
                 thread.join();
                 tenantConfig = TenantConfigsDTO.findOptionalClient(tenant)
                         .orElseThrow(() -> new WebServiceException("No config for this client"));
@@ -172,7 +173,7 @@ public class DatasourceTenantConfigResolver implements TenantConnectionResolver 
         FlyWayThread migrationThread = new FlyWayThread(tenantConfig);
 
         // Should await?
-        try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
             executor.submit(migrationThread);
         }
