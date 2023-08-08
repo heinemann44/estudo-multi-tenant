@@ -1,6 +1,5 @@
 package br.com.will.service;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,19 +11,17 @@ import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
 import br.com.will.model.TenantConfig;
 import br.com.will.repository.TenantConfigRepository;
+import br.com.will.tenant.TenantContext;
 import br.com.will.util.ObjectMapperUtils;
 import io.agroal.api.AgroalDataSource;
-import io.agroal.api.AgroalDataSource.FlushMode;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
-import jakarta.enterprise.inject.Default;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response.Status;
 
 @ApplicationScoped
-@Default
 public class TenantService {
 
     @Inject
@@ -42,10 +39,10 @@ public class TenantService {
     }
 
     @ActivateRequestContext
-    public void updateTenants(String tenant) {
+    public void updateAllTenants() {
         Log.info("Updating tenants");
 
-        sessionFactory.withOptions().tenantIdentifier(tenant).openSession();
+        sessionFactory.withOptions().tenantIdentifier(TenantContext.getTenant()).openSession();
 
         List<TenantConfig> newTenants = tenantConfigRepository.findAll().list();
 
@@ -83,6 +80,7 @@ public class TenantService {
             Optional<TenantDTO> currentTenant = TenantConfigsDTO.findOptionalClient(tenantConfig.getTenantId());
 
             if (currentTenant.isPresent()) {
+
                 AgroalDataSource dataSource = currentTenant.get().getDatasource();
                 /**
                  * TODO how to Fix?

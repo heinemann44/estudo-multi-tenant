@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
-import br.com.will.constant.TenantConstant;
 import br.com.will.dto.TenantConfigsDTO;
 import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
@@ -117,7 +116,7 @@ public class DatasourceTenantConfigResolver implements TenantConnectionResolver 
             // This will get new tenants and validate migrations
             // Will not close any connections that are already open
             // But be aware that it will spaw a lot of connections
-            TenantAwareThread thread = new TenantAwareThread(() -> tenantService.updateTenants(TenantConstant.DEFAULT));
+            TenantAwareThread thread = new TenantAwareThread(() -> tenantService.updateAllTenants());
             thread.start();
 
             try {

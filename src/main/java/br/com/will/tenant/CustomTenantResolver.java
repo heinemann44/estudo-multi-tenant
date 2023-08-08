@@ -1,10 +1,12 @@
 package br.com.will.tenant;
 
+import java.util.Optional;
+
 import br.com.will.constant.TenantConstant;
-import br.com.will.dto.TenantHolderDTO;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.hibernate.orm.PersistenceUnitExtension;
 import io.quarkus.hibernate.orm.runtime.tenant.TenantResolver;
+import io.vertx.ext.web.RoutingContext;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
@@ -14,7 +16,7 @@ import jakarta.inject.Inject;
 public class CustomTenantResolver implements TenantResolver {
 
     @Inject
-    TenantHolderDTO tenantHolder;
+    RoutingContext context;
 
     @Override
     public String getDefaultTenantId() {
@@ -23,11 +25,20 @@ public class CustomTenantResolver implements TenantResolver {
 
     @Override
     public String resolveTenantId() {
+
+        String tenant;
+
         try {
-            return tenantHolder.getTenant();
+            tenant = Optional.ofNullable(context.request().headers().get("x-tenant")).orElse(TenantConstant.DEFAULT);
+
         } catch (Exception e) {
-            return TenantConstant.DEFAULT;
+            tenant = TenantConstant.DEFAULT;
         }
+
+        TenantContext.setTenant(tenant);
+
+        return tenant;
+
     }
 
 }
