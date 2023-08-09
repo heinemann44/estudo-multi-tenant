@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
 import br.com.will.dto.TenantConfigsDTO;
@@ -60,7 +61,7 @@ import jakarta.transaction.Transactional;
 @Default
 @Unremovable
 @PersistenceUnitExtension
-public class DatasourceTenantConfigResolver implements TenantConnectionResolver {
+public class CustomTenantConnectionResolver implements TenantConnectionResolver {
 
     private static final String RESOLVED_DRIVER_CLASS = "org.postgresql.Driver";
     private static final String RESOLVED_DB_KIND = "postgresql";
