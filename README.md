@@ -29,7 +29,7 @@ Follow the steps below to install and run the application:
 
 ```bash
 git clone https://github.com/Willian199/sample-multitenacy
-cd quarkus-dynamic-tenants
+cd sample-multitenacy
 ```
 
 2. Configure the database information in the `application.properties` file.
@@ -116,12 +116,6 @@ The request body should contain the Car details in JSON format, for example:
 2. **Data Encryption:** Implement data encryption for sensitive information.
 
 3. **Customizable Migrations:** Allow tenants to customize their migrations.
-
-4. **Tenant Usage Statistics:** Offer insights into tenant resource usage.
-
-5. **Connections Enhanced:** Optimize connection usage, a solution to recognize tenants that point to the same database. Currently, Agroal does not identify this situation and creates separate connections for each tenant, even when they share the same database.
-
-6. **Close Connections:** Implement a way to programmatically close connections. Currently, if a tenant is deleted from the database, the connections are still active. 
 
 
 # Conclusion

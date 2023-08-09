@@ -1,5 +1,7 @@
 package br.com.will.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.agroal.api.AgroalDataSource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +26,7 @@ public class TenantDTO {
 
         private Boolean flagSSL = Boolean.FALSE;
 
+        @JsonIgnore
         private AgroalDataSource datasource;
 
 }

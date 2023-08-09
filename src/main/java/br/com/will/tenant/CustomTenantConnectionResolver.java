@@ -8,10 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
-import br.com.will.dto.TenantConfigsDTO;
 import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
 import br.com.will.service.TenantService;
@@ -61,7 +59,7 @@ import jakarta.transaction.Transactional;
 @Default
 @Unremovable
 @PersistenceUnitExtension
-public class CustomTenantConnectionResolver implements TenantConnectionResolver {
+public final class CustomTenantConnectionResolver implements TenantConnectionResolver {
 
     private static final String RESOLVED_DRIVER_CLASS = "org.postgresql.Driver";
     private static final String RESOLVED_DB_KIND = "postgresql";
@@ -92,7 +90,7 @@ public class CustomTenantConnectionResolver implements TenantConnectionResolver 
         Log.debugv("resolve({0})", tenantId);
         if (!Objects.equals(tenantId, "default")) {
 
-            return new QuarkusConnectionProvider(this.doCreateDataSource(tenantId));
+            return new CustomConnectionProvider(this.doCreateDataSource(tenantId));
 
         }
         return new QuarkusConnectionProvider(Arc.container().instance(AgroalDataSource.class).get());
@@ -107,12 +105,9 @@ public class CustomTenantConnectionResolver implements TenantConnectionResolver 
      */
     public AgroalDataSource doCreateDataSource(String tenant) {
 
-        Optional<TenantDTO> tenantOptional = TenantConfigsDTO.findOptionalClient(tenant);
+        TenantDTO tenantConfig = TenantDataSource.get(tenant);
 
-        TenantDTO tenantConfig = null;
-        if (tenantOptional.isPresent()) {
-            tenantConfig = tenantOptional.get();
-        } else {
+        if (tenantConfig == null) {
 
             // This will get new tenants and validate migrations
             // Will not close any connections that are already open
@@ -123,7 +118,7 @@ public class CustomTenantConnectionResolver implements TenantConnectionResolver 
             try {
                 // Join doesn't have effect with Virtual Thread
                 thread.join();
-                tenantConfig = TenantConfigsDTO.findOptionalClient(tenant)
+                tenantConfig = Optional.ofNullable(TenantDataSource.get(tenant))
                         .orElseThrow(() -> new WebServiceException("No config for this client"));
 
             } catch (InterruptedException e) {
@@ -167,8 +162,6 @@ public class CustomTenantConnectionResolver implements TenantConnectionResolver 
         if (!interceptorList.isEmpty()) {
             dataSource.setPoolInterceptors(interceptorList);
         }
-
-        tenantConfig.setDatasource(dataSource);
 
         FlyWayThread migrationThread = new FlyWayThread(tenantConfig);
 

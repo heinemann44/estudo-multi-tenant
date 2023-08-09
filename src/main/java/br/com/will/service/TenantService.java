@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SessionFactory;
 
-import br.com.will.dto.TenantConfigsDTO;
 import br.com.will.dto.TenantDTO;
 import br.com.will.interceptor.WebServiceException;
 import br.com.will.model.TenantConfig;
 import br.com.will.repository.TenantConfigRepository;
+import br.com.will.tenant.CustomConnectionProvider;
 import br.com.will.tenant.TenantContext;
+import br.com.will.tenant.TenantDataSource;
 import br.com.will.util.ObjectMapperUtils;
-import io.agroal.api.AgroalDataSource;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
@@ -30,11 +30,16 @@ public class TenantService {
     @Inject
     SessionFactory sessionFactory;
 
+    @Inject
+    CustomConnectionProvider customConnectionProvider;
+
     @Transactional
     public void updateTenants() {
         Log.info("Updating tenants");
-        List<TenantConfig> tenants = tenantConfigRepository.findAll().list();
-        TenantConfigsDTO.setConfigs(ObjectMapperUtils.mapAll(tenants, TenantDTO.class));
+        List<TenantConfig> newTenants = tenantConfigRepository.findAll().list();
+        for (TenantConfig tenant : newTenants) {
+            TenantDataSource.add(tenant.getTenantId(), ObjectMapperUtils.map(tenant, TenantDTO.class));
+        }
 
     }
 
@@ -46,14 +51,24 @@ public class TenantService {
 
         List<TenantConfig> newTenants = tenantConfigRepository.findAll().list();
 
-        TenantConfigsDTO.setConfigs(ObjectMapperUtils.mapAll(newTenants, TenantDTO.class));
+        for (TenantConfig tenant : newTenants) {
+            TenantDataSource.add(tenant.getTenantId(), ObjectMapperUtils.map(tenant, TenantDTO.class));
+        }
 
     }
 
     @Transactional
     public void delete(Long id) {
         Log.info("Running tenant delete");
-        tenantConfigRepository.deleteById(id);
+
+        TenantConfig tenant = tenantConfigRepository.findById(id);
+
+        if (tenant != null) {
+
+            customConnectionProvider.removeDatasource(tenant.getTenantId());
+
+            tenantConfigRepository.deleteById(id);
+        }
     }
 
     public List<TenantDTO> listAll() {
@@ -77,26 +92,7 @@ public class TenantService {
                 throw new WebServiceException("Tenant not found", Status.NOT_FOUND);
             }
 
-            Optional<TenantDTO> currentTenant = TenantConfigsDTO.findOptionalClient(tenantConfig.getTenantId());
-
-            if (currentTenant.isPresent()) {
-
-                AgroalDataSource dataSource = currentTenant.get().getDatasource();
-                /**
-                 * TODO how to Fix?
-                 * 
-                 * This close the connections to databse
-                 * But the Tenant still alive
-                 * If retry to connect will fail with
-                 * ERROR [org.hib.eng.jdb.spi.SqlExceptionHelper] (executor-thread-1) This pool
-                 * is closed and does not handle any more connections!
-                 * 
-                 * if (dataSource != null) {
-                 * dataSource.flush(FlushMode.ALL);
-                 * dataSource.close();
-                 * }
-                 */
-            }
+            customConnectionProvider.removeDatasource(tenantConfig.getTenantId());
         } else {
             tenantConfig = new TenantConfig();
         }
