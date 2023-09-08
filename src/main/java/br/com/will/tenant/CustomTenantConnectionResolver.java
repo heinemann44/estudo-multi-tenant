@@ -90,7 +90,7 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
         Log.debugv("resolve({0})", tenantId);
         if (!Objects.equals(tenantId, "default")) {
 
-            return new CustomConnectionProvider(this.doCreateDataSource(tenantId));
+            return this.doCreateDataSource(tenantId);
 
         }
         return new QuarkusConnectionProvider(Arc.container().instance(AgroalDataSource.class).get());
@@ -103,7 +103,7 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
      * @param tenant The tenantId for which to create the DataSource.
      * @return The AgroalDataSource for the specified tenant.
      */
-    public AgroalDataSource doCreateDataSource(String tenant) {
+    public CustomConnectionProvider doCreateDataSource(String tenant) {
 
         TenantDTO tenantConfig = TenantDataSource.get(tenant);
 
@@ -163,6 +163,8 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
             dataSource.setPoolInterceptors(interceptorList);
         }
 
+        CustomConnectionProvider connectionProvider = new CustomConnectionProvider(dataSource);
+
         FlyWayThread migrationThread = new FlyWayThread(tenantConfig);
 
         // Should await?
@@ -171,7 +173,7 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
             executor.submit(migrationThread);
         }
 
-        return dataSource;
+        return connectionProvider;
     }
 
     /**

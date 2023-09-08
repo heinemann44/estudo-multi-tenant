@@ -34,6 +34,7 @@ public class FlyWayThread implements Callable<Boolean> {
             Log.infov("Migration {0} has been finalized", clientConfig.getTenantId());
 
         } catch (Exception e) {
+            e.printStackTrace();
             Log.errorv("Error when running migration for: {0}", clientConfig.getTenantId());
 
         }

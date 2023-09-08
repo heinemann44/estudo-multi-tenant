@@ -2,9 +2,9 @@ package br.com.will.interceptor;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.reactive.server.ServerRequestFilter;
 
+import io.quarkus.runtime.util.StringUtil;
 import io.smallrye.mutiny.Uni;
 import jakarta.annotation.security.PermitAll;
 import jakarta.ws.rs.container.ResourceInfo;
@@ -25,14 +25,6 @@ public class RestValidator {
     private static final Uni<Response> FORBIDDEN = Uni.createFrom()
             .item(Response.status(Response.Status.FORBIDDEN).build());
 
-    /*
-     * @ServerRequestFilter(preMatching = true)
-     * public void preMatchingFilter() {
-     * 
-     * requestContext.setRequestUri(URI.create("/what"));
-     * }
-     */
-
     @ServerRequestFilter()
     public Uni<Response> filter() {
 
@@ -42,7 +34,7 @@ public class RestValidator {
 
             final String tenant = httpHeaders.getHeaderString("x-tenant");
 
-            if (StringUtils.isBlank(tenant)) {
+            if (StringUtil.isNullOrEmpty(tenant)) {
                 return FORBIDDEN;
             }
 

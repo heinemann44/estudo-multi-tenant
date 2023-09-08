@@ -7,12 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class TenantProperties {
 
-    @ConfigProperty(name = "custom.datasource.host")
-    private String datasourceHost;
-
-    @ConfigProperty(name = "custom.datasource.database-name")
-    private String datasourceDatabaseName;
-
     @ConfigProperty(name = "custom.datasource.max-size", defaultValue = "20")
     private Integer maxSize;
 
@@ -21,14 +15,6 @@ public class TenantProperties {
 
     @ConfigProperty(name = "quarkus.application.name", defaultValue = "Quarkus Multitenacy")
     private String aplicationName;
-
-    public String getDatasourceHost() {
-        return datasourceHost;
-    }
-
-    public String getDatasourceDatabaseName() {
-        return datasourceDatabaseName;
-    }
 
     public Integer getMaxSize() {
         return maxSize;

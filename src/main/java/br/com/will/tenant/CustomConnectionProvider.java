@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.UnknownUnwrapTypeException;
 
@@ -15,6 +14,7 @@ import io.agroal.api.AgroalDataSource;
 import io.quarkus.agroal.DataSource;
 import io.quarkus.arc.Arc;
 import io.quarkus.logging.Log;
+import io.quarkus.runtime.util.StringUtil;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -23,7 +23,7 @@ public final class CustomConnectionProvider implements ConnectionProvider {
     public CustomConnectionProvider(final AgroalDataSource dataSource) {
 
         String tenant = TenantContext.getTenant();
-        if (StringUtils.isBlank(tenant)) {
+        if (StringUtil.isNullOrEmpty(tenant)) {
             tenant = TenantConstant.DEFAULT;
         }
 
