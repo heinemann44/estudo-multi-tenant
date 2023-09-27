@@ -27,12 +27,4 @@ public class TenantAwareThread extends Thread {
         TenantContext.clear();
     }
 
-    // Override the start method to use VirtualThread
-    /*
-     * @Override
-     * public void start() {
-     * Thread virtualThread = Thread.startVirtualThread(this::run);
-     * virtualThread.setName(this.getName());
-     * }
-     */
 }

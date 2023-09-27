@@ -112,11 +112,11 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
             // This will get new tenants and validate migrations
             // Will not close any connections that are already open
             // But be aware that it will spaw a lot of connections
-            TenantAwareThread thread = new TenantAwareThread(() -> tenantService.updateAllTenants());
-            thread.start();
+            TenantAwareThread thread = new TenantAwareThread(() -> tenantService.updateTenant(tenant));
 
             try {
                 // Join doesn't have effect with Virtual Thread
+                thread.start();
                 thread.join();
                 tenantConfig = Optional.ofNullable(TenantDataSource.get(tenant))
                         .orElseThrow(() -> new WebServiceException("No config for this client"));

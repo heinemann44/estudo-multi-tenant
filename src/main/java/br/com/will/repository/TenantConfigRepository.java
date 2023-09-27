@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class TenantConfigRepository implements PanacheRepository<TenantConfig> {
 
     public TenantConfig findByTenantId(String tenant) {
-        return find("tenantId", tenant).firstResult();
+        return find("tenantId", tenant).singleResult();
     }
 
 }

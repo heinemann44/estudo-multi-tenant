@@ -1,5 +1,6 @@
 package br.com.will.interceptor;
 
+import br.com.will.tenant.TenantContext;
 import io.quarkus.logging.Log;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -12,6 +13,9 @@ public class ExceptionInterceptor implements ExceptionMapper<Exception> {
 
 	@Override
 	public Response toResponse(Exception ex) {
+
+		// Must clear to avoid memory leak
+		TenantContext.clear();
 
 		if (ex instanceof WebServiceException exception) {
 			Log.errorv("ERRO --> {0}", exception.getMessage());

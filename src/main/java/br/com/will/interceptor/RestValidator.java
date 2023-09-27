@@ -1,12 +1,10 @@
 package br.com.will.interceptor;
 
-import java.lang.reflect.Method;
-
 import org.jboss.resteasy.reactive.server.ServerRequestFilter;
 
+import br.com.will.tenant.TenantContext;
 import io.quarkus.runtime.util.StringUtil;
 import io.smallrye.mutiny.Uni;
-import jakarta.annotation.security.PermitAll;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -28,17 +26,13 @@ public class RestValidator {
     @ServerRequestFilter()
     public Uni<Response> filter() {
 
-        Method method = resourceInfo.getResourceMethod();
+        final String tenant = httpHeaders.getHeaderString("x-tenant");
 
-        if (!method.isAnnotationPresent(PermitAll.class)) {
-
-            final String tenant = httpHeaders.getHeaderString("x-tenant");
-
-            if (StringUtil.isNullOrEmpty(tenant)) {
-                return FORBIDDEN;
-            }
-
+        if (StringUtil.isNullOrEmpty(tenant)) {
+            return FORBIDDEN;
         }
+
+        TenantContext.setTenant(tenant);
 
         return Uni.createFrom().nullItem();
 

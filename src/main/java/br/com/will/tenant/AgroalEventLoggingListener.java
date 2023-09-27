@@ -18,7 +18,7 @@ final class AgroalEventLoggingListener implements AgroalDataSourceListener {
 
     @Override
     public void onConnectionInvalid(Connection connection) {
-        Log.warnv("Connections is not valid for tenant: {0}", tenant);
+        Log.warnv("Connection doesn't valid for tenant: {0}", tenant);
         TenantDataSource.remove(tenant);
     }
 
@@ -30,5 +30,6 @@ final class AgroalEventLoggingListener implements AgroalDataSourceListener {
     @Override
     public void onConnectionDestroy(Connection connection) {
         Log.warnv("Connection for tenant destroyed: {0}", tenant);
+        TenantDataSource.remove(tenant);
     }
 }

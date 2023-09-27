@@ -33,13 +33,14 @@ public class TenantService {
     CustomConnectionProvider customConnectionProvider;
 
     @ActivateRequestContext
-    public void updateAllTenants() {
+    public void updateTenant(String tenant) {
         Log.info("Updating tenants");
 
-        List<TenantConfig> newTenants = tenantConfigRepository.findAll().list();
+        TenantConfig newTenant = tenantConfigRepository.findByTenantId(tenant);
 
-        for (TenantConfig tenant : newTenants) {
-            TenantDataSource.add(tenant.getTenantId(), ObjectMapperUtils.map(tenant, TenantDTO.class));
+        if (newTenant != null) {
+
+            TenantDataSource.add(tenant, ObjectMapperUtils.map(newTenant, TenantDTO.class));
         }
 
     }

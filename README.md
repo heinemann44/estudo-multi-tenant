@@ -109,15 +109,6 @@ The request body should contain the Car details in JSON format, for example:
 }
 ```
 
-## Additional Functionalities (TODO)
-
-1. **Tenant Metrics and Monitoring:** Implement a monitoring system to track tenant performance.
-
-2. **Data Encryption:** Implement data encryption for sensitive information.
-
-3. **Customizable Migrations:** Allow tenants to customize their migrations.
-
-
 # Conclusion
 This project demonstrates how to create a Quarkus application with dynamic tenants support, connecting to different databases for each tenant. Flyway library is used for managing migrations, executing migrations in a separate thread and using an efficient connection pool provides a more efficient and scalable development experience.
 

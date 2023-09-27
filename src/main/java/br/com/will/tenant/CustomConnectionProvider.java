@@ -81,7 +81,7 @@ public final class CustomConnectionProvider implements ConnectionProvider {
     }
 
     @Override
-    public boolean isUnwrappableAs(final Class unwrapType) {
+    public boolean isUnwrappableAs(final Class<?> unwrapType) {
         return ConnectionProvider.class.equals(unwrapType)
                 || CustomConnectionProvider.class.isAssignableFrom(unwrapType)
                 || DataSource.class.isAssignableFrom(unwrapType) || AgroalDataSource.class.isAssignableFrom(unwrapType);

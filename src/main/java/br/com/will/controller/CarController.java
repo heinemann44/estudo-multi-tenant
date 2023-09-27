@@ -19,7 +19,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/carController")
+@Path("carController")
 @ApplicationScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -33,7 +33,7 @@ public class CarController {
 
     @POST
     @RunOnVirtualThread
-    @Path("/save")
+    @Path("save")
     public Response save(CarDTO carDTO) {
         carService.save(carDTO);
         Log.info(Thread.currentThread());
@@ -42,7 +42,7 @@ public class CarController {
 
     @GET
     @RunOnVirtualThread
-    @Path("/listAll")
+    @Path("listAll")
     public List<CarDTO> listAll() {
         Log.info(Thread.currentThread());
         return carService.listAll();
@@ -50,7 +50,7 @@ public class CarController {
 
     @DELETE
     @RunOnVirtualThread
-    @Path("/delete/{id}")
+    @Path("delete/{id}")
     public Response delete(@PathParam("id") Long id) {
         carService.delete(id);
 
