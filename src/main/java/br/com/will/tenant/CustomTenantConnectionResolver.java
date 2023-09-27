@@ -1,5 +1,7 @@
 package br.com.will.tenant;
 
+import static jakarta.interceptor.Interceptor.Priority.PLATFORM_AFTER;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
@@ -53,7 +55,7 @@ import jakarta.transaction.Transactional;
  * configuration.
  */
 @Alternative
-@Priority(1)
+@Priority(PLATFORM_AFTER)
 @Singleton
 @Transactional
 @Default
