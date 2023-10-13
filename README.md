@@ -1,13 +1,13 @@
 # Quarkus Application with Dynamic Tenants Support
 
-This is a Quarkus project in Java 20 that implements dynamic tenants functionality, allowing connections to different databases. Each tenant has a separate PostgreSQL database, and migrations are managed using Flyway and Agroal libraries. Additionally, migrations are executed in a separate thread upon server startup. Tenant registration is performed through REST requests, and to test the application, we have a car API that performs selects on the databases related to each tenant.
+This is a Quarkus project in Java 21 that implements dynamic tenants functionality, allowing connections to different databases. Each tenant has a separate PostgreSQL database, and migrations are managed using Flyway and Agroal libraries. Tenant registration is performed through REST requests, and to test the application, we have a car API that performs selects on the databases related to each tenant.
 
 ## Requirements
 
 Make sure you have the following requirements installed on your machine before proceeding:
 
-1. Java 20
-2. Quarkus Framework 3.2
+1. Java 21
+2. Quarkus Framework 3.4.3
 3. PostgreSQL 15
 4. Flyway
 5. Agroal (Connection pool management library)
@@ -15,7 +15,7 @@ Make sure you have the following requirements installed on your machine before p
 7. Lombok
 8. Hibernate with Panache
 9. Resteasy with Jackson
-10. Virtual Threads (Preview)
+10. Virtual Threads
 
 ## Database Configuration
 
