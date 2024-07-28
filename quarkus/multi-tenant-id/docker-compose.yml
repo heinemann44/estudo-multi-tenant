@@ -1,0 +1,27 @@
+services:
+  database:
+    image: "postgres:16.0-alpine3.18"
+    hostname: database
+    container_name: postgres-single-tenant
+    env_file:
+      - ./.env.development
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    deploy:
+      resources:
+        limits:
+          cpus: "1.3"
+          memory: "1.3GB"
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #     PGADMIN_LISTEN_PORT: 5050
+  #   ports:
+  #     - "5050:5050"
+  #   depends_on:
+  #     - database

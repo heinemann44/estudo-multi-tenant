@@ -1,0 +1,39 @@
+package config.filter;
+
+import java.util.Objects;
+
+import org.jboss.resteasy.reactive.server.ServerRequestFilter;
+
+import config.database.TenantContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
+
+class TenantFilter {
+    
+    private static final String PRIVATE_TENANT_HEADER = "tenant-id";
+
+    private static final String DEFAULT_TENANT = "public";
+
+    private static final ThreadLocal<String> currentTenant = new InheritableThreadLocal<>();
+
+    public static String getCurrentTenant() {
+        String tenant = currentTenant.get();
+        return Objects.requireNonNullElse(tenant, DEFAULT_TENANT);
+    }
+
+    public static void setCurrentTenant(String tenant) {
+        currentTenant.set(tenant);
+    }
+    
+    public static void clear() {
+        currentTenant.remove();
+    }
+
+    @ServerRequestFilter
+    public void preMatchingFilter(ContainerRequestContext requestContext) {
+        String privateTenant = requestContext.getHeaderString(PRIVATE_TENANT_HEADER);
+
+        if (privateTenant != null) {
+            TenantContext.setCurrentTenant(privateTenant);
+        }
+    }
+}
