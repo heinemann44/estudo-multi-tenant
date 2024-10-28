@@ -38,7 +38,7 @@ public final class CustomConnectionProvider implements ConnectionProvider {
 
     @Override
     public Connection getConnection() throws SQLException {
-        Log.info("CustomConnectionProvider getConnection");
+        // Log.info("CustomConnectionProvider getConnection");
 
         String tenant = Optional.ofNullable(TenantContext.getTenant()).orElse(TenantConstant.DEFAULT);
 
@@ -71,7 +71,7 @@ public final class CustomConnectionProvider implements ConnectionProvider {
 
     @Override
     public void closeConnection(final Connection connection) throws SQLException {
-        Log.info("CustomConnectionProvider closeConnection");
+        // Log.info("CustomConnectionProvider closeConnection");
         connection.close();
     }
 

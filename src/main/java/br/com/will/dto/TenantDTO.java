@@ -22,6 +22,8 @@ public class TenantDTO {
 
         private String datasourceName;
 
+        private String datasourceScheme;
+
         private String datasourceUsername;
 
         private String datasourcePassword;

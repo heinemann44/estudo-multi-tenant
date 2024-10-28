@@ -24,4 +24,8 @@ public final class TenantDataSource {
         dataSourceMap.remove(tenantId);
     }
 
+    public static void listAll() {
+        dataSourceMap.keySet().forEach((data) -> System.out.println(dataSourceMap.get(data)));
+    }
+
 }

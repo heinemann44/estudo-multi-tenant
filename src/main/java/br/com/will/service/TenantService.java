@@ -93,13 +93,17 @@ public class TenantService {
             throw new WebServiceException("Must inform all values");
         }
 
+        Log.info("Preencher os dados");
+        
         tenantConfig.setDatasourceHost(tenantDTO.getDatasourceHost());
         tenantConfig.setDatasourceName(tenantDTO.getDatasourceName());
+        tenantConfig.setDatasourceScheme(tenantDTO.getDatasourceScheme());
         tenantConfig.setDatasourcePassword(tenantDTO.getDatasourcePassword());
         tenantConfig.setDatasourceUsername(tenantDTO.getDatasourceUsername());
         tenantConfig.setFlagSSL(Optional.ofNullable(tenantDTO.getFlagSSL()).orElse(Boolean.FALSE));
         tenantConfig.setTenantId(tenantDTO.getTenantId());
-
+        
+        Log.info("Salvar");
         tenantConfigRepository.persist(tenantConfig);
     }
 

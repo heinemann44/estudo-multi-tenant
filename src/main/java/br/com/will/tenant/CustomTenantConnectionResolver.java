@@ -26,6 +26,7 @@ import io.agroal.api.configuration.supplier.AgroalConnectionPoolConfigurationSup
 import io.agroal.api.configuration.supplier.AgroalDataSourceConfigurationSupplier;
 import io.agroal.api.security.NamePrincipal;
 import io.agroal.api.security.SimplePassword;
+import io.agroal.api.transaction.TransactionIntegration;
 import io.agroal.narayana.NarayanaTransactionIntegration;
 import io.agroal.pool.DataSource;
 import io.quarkus.agroal.runtime.AgroalConnectionConfigurer;
@@ -200,16 +201,15 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
      * @return The AgroalDataSourceConfigurationSupplier.
      */
 
-    private AgroalDataSourceConfiguration createDatasourceConfiguration(TenantDTO tenantConfig,
-            Class<?> driver) {
+    private AgroalDataSourceConfiguration createDatasourceConfiguration(TenantDTO tenantConfig, Class<?> driver) {
         AgroalDataSourceConfigurationSupplier dataSourceConfiguration = new AgroalDataSourceConfigurationSupplier();
         dataSourceConfiguration.metricsEnabled(false);
 
         AgroalConnectionPoolConfigurationSupplier poolConfiguration = dataSourceConfiguration
                 .connectionPoolConfiguration();
 
-        io.agroal.api.transaction.TransactionIntegration txIntegration = new NarayanaTransactionIntegration(
-                this.transactionManager, this.transactionSynchronizationRegistry);
+        TransactionIntegration txIntegration = new NarayanaTransactionIntegration(this.transactionManager,
+                this.transactionSynchronizationRegistry);
 
         poolConfiguration.transactionIntegration(txIntegration);
         poolConfiguration.initialSize(configuration.getMinSize());
@@ -218,15 +218,24 @@ public final class CustomTenantConnectionResolver implements TenantConnectionRes
         poolConfiguration.maxLifetime(Duration.ofMinutes(30));
 
         poolConfiguration.connectionValidator(AgroalConnectionPoolConfiguration.ConnectionValidator.defaultValidator());
-        poolConfiguration.acquisitionTimeout(Duration.ofSeconds(5));
-        poolConfiguration.validationTimeout(Duration.ofSeconds(120));
+        poolConfiguration.acquisitionTimeout(Duration.ZERO);
+        poolConfiguration.validationTimeout(Duration.ZERO);
+        // poolConfiguration.acquisitionTimeout(Duration.ofSeconds(5));
+        // poolConfiguration.validationTimeout(Duration.ofSeconds(120));
 
         poolConfiguration.reapTimeout(Duration.ofSeconds(300));
 
         AgroalConnectionFactoryConfigurationSupplier connectionFactoryConfiguration = poolConfiguration
                 .connectionFactoryConfiguration();
 
-        connectionFactoryConfiguration.jdbcUrl(tenantConfig.getDatasourceHost() + tenantConfig.getDatasourceName());
+        String jdbcUrl = tenantConfig.getDatasourceHost() + tenantConfig.getDatasourceName() + "?currentSchema="
+                + tenantConfig.getDatasourceScheme();
+
+        connectionFactoryConfiguration.jdbcUrl(jdbcUrl);
+
+        System.out.println("Conectado na base de dados:");
+        System.out.println(jdbcUrl);
+
         connectionFactoryConfiguration.connectionProviderClass(driver);
         connectionFactoryConfiguration.trackJdbcResources(true);
         connectionFactoryConfiguration.jdbcProperty("ApplicationName", configuration.getAplicationName());

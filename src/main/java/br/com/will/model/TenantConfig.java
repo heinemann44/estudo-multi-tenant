@@ -33,6 +33,9 @@ public class TenantConfig {
     @Column(name = "tx_datasource_name", nullable = false)
     private String datasourceName;
 
+    @Column(name = "tx_datasource_scheme", nullable = false)
+    private String datasourceScheme;
+
     // Should encript before save
     @Column(name = "tx_datasource_username", nullable = false)
     private String datasourceUsername;
