@@ -1,0 +1,42 @@
+services:
+  db-postgresql:
+    image: postgres:latest
+    hostname: db-postgresql
+    environment:
+      - POSTGRES_PASSWORD=quarkus
+      - POSTGRES_USER=quarkus
+      - POSTGRES_DB=quarkus
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2GB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  db-tenant:
+    image: postgres:latest
+    hostname: db-tenant
+    environment:
+      - POSTGRES_PASSWORD=quarkus
+      - POSTGRES_USER=quarkus
+      - POSTGRES_DB=tenants
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2GB"
