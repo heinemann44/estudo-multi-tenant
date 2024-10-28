@@ -1,0 +1,110 @@
+version: "3.5"
+
+services:
+  quarkus-api1:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    hostname: api1
+    depends_on:
+      - database-catalog
+      - database-a
+      - database-b
+    environment:
+      APP_PORT: 8080
+      APP_DATASOURCE_URL: jdbc:postgresql://localhost:5432/local_database
+      APP_DATASOURCE_USERNAME: local_user
+      APP_DATASOURCE_PASSWORD: local_password
+      APP_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2GB"
+    network_mode: host
+
+  quarkus-api2:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    hostname: api2
+    depends_on:
+      - database-catalog
+      - database-a
+      - database-b
+    environment:
+      APP_PORT: 8081
+      APP_DATASOURCE_URL: jdbc:postgresql://localhost:5432/local_database
+      APP_DATASOURCE_USERNAME: local_user
+      APP_DATASOURCE_PASSWORD: local_password
+      APP_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2GB"
+    network_mode: host
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - quarkus-api1
+      - quarkus-api2
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2GB"
+    network_mode: host
+
+  database-catalog:
+    image: "postgres:16.0-alpine3.18"
+    hostname: database-catalog
+    container_name: postgres-multi-tenant-dynamic-catalog
+    env_file:
+      - ./.env.development
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "1GB"
+
+  database-a:
+    image: "postgres:16.0-alpine3.18"
+    hostname: database-a
+    container_name: postgres-multi-tenant-dynamic-a
+    command: -p 5433
+    environment:
+      POSTGRES_HOST: database-a
+      POSTGRES_PORT: 5433
+      POSTGRES_USER: local_user
+      POSTGRES_DB: local_database
+      POSTGRES_PASSWORD: local_password
+    deploy:
+      resources:
+        limits:
+          cpus: "3"
+          memory: "3GB"
+    network_mode: host
+
+  database-b:
+    image: "postgres:16.0-alpine3.18"
+    hostname: database-b
+    container_name: postgres-multi-tenant-dynamic-b
+    command: -p 5434
+    environment:
+      POSTGRES_HOST: database-b
+      POSTGRES_PORT: 5434
+      POSTGRES_USER: local_user
+      POSTGRES_DB: local_database
+      POSTGRES_PASSWORD: local_password
+    deploy:
+      resources:
+        limits:
+          cpus: "3"
+          memory: "3GB"
+    network_mode: host
